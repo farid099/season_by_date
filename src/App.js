@@ -1,26 +1,36 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import Seasons from './components/Seasons';
+import Loading from './components/Loading';
+import './components/season.css'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+export default class App extends React.Component{
+  state={lat:null,error_message:""}
+
+  componentDidMount() {
+      window.navigator.geolocation.getCurrentPosition(
+          position=> this.setState({
+              lat:position.coords.latitude
+          }),
+          err=> this.setState({
+              error_message:err.message
+          })
+      );
+    }
+
+    renderContent(){
+        if (this.state.lat && !this.state.error_message) {
+            return <Seasons lat={this.state.lat}></Seasons>
+        }
+        if (!this.state.lat && this.state.error_message) {
+        return <div>{this.state.error_message}</div>
+        }
+        return <Loading loading_text = {"Please accept location request"}></Loading>
+    }
+  render() {
+      return (
+          <div>
+              {this.renderContent()}
+          </div>
+      )
+  }
 }
-
-export default App;
